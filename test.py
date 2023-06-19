@@ -1,2 +1,2 @@
 print("git 연습중")
-# 올라가져라
+buzz = "far away your my sunshine we were together"
