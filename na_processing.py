@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 ##### Data frame 호출 #####
 def df_open():
@@ -39,5 +40,45 @@ df_json = fill_unknown()
 # print(df_json.isna().sum())  # 확인용
 
 
+#### 문자열 처리 - by 정규표현식 ####
+def preprocessing():
+    df_json['di_edi_code'] = df_json['di_edi_code'].astype(str)  # str이랑 섞여있는것들 str타입으로 변경
+
+    # ,구분자 처리
+    df_json['dl_name'] = df_json['dl_name'].str.replace(',', ' ') 
+    df_json['dl_name_en'] = df_json['dl_name_en'].str.replace(',', ' ')
+    df_json['print_front'] = df_json['print_front'].str.replace(',', ' ')
+    df_json['dl_custom_shape'] = df_json['dl_custom_shape'].str.replace(',', '|')
+    df_json['di_class_no'] = df_json['di_class_no'].str.replace(',', '|')
+    df_json['di_edi_code'] = df_json['di_edi_code'].str.replace(',', '|')
+    df_json['color_class1'] = df_json['color_class1'].str.replace(',', '|')
+    df_json['form_code_name'] = df_json['form_code_name'].str.replace(',', '|')
+
+    # .구분자 처리
+    df_json['di_class_no'] = df_json['di_class_no'].str.replace('.', '|')
+    df_json['dl_material'] = df_json['dl_material'].str.replace('.', '|')
+    df_json['dl_material_en'] = df_json['dl_material_en'].str.replace('.', '|')
+    df_json['dl_name'] = df_json['dl_name'].str.replace(',', '|')
+    df_json['dl_name_en'] = df_json['dl_name_en'].str.replace(',', '|')
+
+    # 공백처리
+    df_json['di_edi_code'] = df_json['di_edi_code'].astype(str).replace(r'\.0$', '', regex = True)
+    df_json['leng_short'] = df_json['leng_short'].replace(r'\s', '', regex = True)
+    df_json['leng_long'] = df_json['leng_long'].replace(r'\s', '', regex = True)
+    df_json['thick'] = df_json['thick'].replace(r'\s', '', regex = True)
+
+    # name 분리
+    df_json['dl_name_korean'] = df_json['dl_name'].str.extract(r'([가-힣]+)', expand = False)
+    df_json['dl_name_nonkorean'] = df_json['dl_name'].str.extract(r'([^가-힣]+)', expand = False)
+
+    # chart 삭제
+    df_json.drop('chart', axis = 1, inplace = True)
+    df_json['dl_name_nonkorean'] = df_json['dl_name_nonkorean'].fillna('unknown')
+    # df.to_csv('data_ho.csv')
+    return df_json
+
+df_json = preprocessing()
+
+
 ##### csv로 저장하기 #####
-# df_json.to_csv('./data/df_na_processing.csv', encoding = 'UTF-8', index = False)
+# df_json.to_csv('./data/df_pre-processing.csv', encoding = 'UTF-8', index = False)
